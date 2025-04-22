@@ -16,15 +16,11 @@ jobs:
               repo: context.repo.repo,
             });
 
-            console.log(issue.data.labels);
-
             const projectInfo = parseProjectInfo(issue.data.body);
-
-            console.log(projectInfo);
 
             if (!projectInfo) {
               // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
-              await comment(issue.data, 'We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
+              await comment(issue.data, 'We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a public project.');
 
               return;
             }
@@ -52,9 +48,7 @@ jobs:
 
               // if the slug is `github`, we test if a GitHub link is provided
               if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
-                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[\w\-_]+)\/(?<repo>[\w\-_]+)/i;
-
-                console.log(comment);
+                const githubRegex = /https:\/\/stackblitz\.com\/(?:~\/(?:github\.com|github_project)|github)\/(?<owner>[\w\-_]+)\/(?<repo>[\w\-_]+)/i;
 
                 const { owner, repo } = comment.match(githubRegex)?.groups || {};
 
