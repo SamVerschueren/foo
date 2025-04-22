@@ -16,7 +16,7 @@ jobs:
               repo: context.repo.repo,
             });
 
-            console.log(issue);
+            console.log(issue.data.labels);
 
             const projectInfo = parseProjectInfo(issue.data.body);
 
@@ -52,7 +52,7 @@ jobs:
 
               // if the slug is `github`, we test if a GitHub link is provided
               if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
-                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[^/]+)\/(?<repo>[^/?#]+)/i;
+                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[\w-_]+)\/(?<repo>[\w-_]+)/i;
 
                 const { owner, repo } = comment.match(githubRegex)?.groups || {};
 
