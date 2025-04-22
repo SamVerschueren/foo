@@ -16,8 +16,6 @@ jobs:
               repo: context.repo.repo,
             });
 
-            console.log(issue);
-
             const regexp = /https:\/\/(stackblitz\.com|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
 
             const match = issue.data.body.match(regexp);
@@ -25,6 +23,8 @@ jobs:
             const slug = match?.groups?.slug;
 
             if (!slug) {
+              console.log('IT SHOULD COMMENT!');
+
               // if no slug is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
               await comment('We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
 
@@ -51,7 +51,7 @@ jobs:
             });
 
             async function comment(body) {
-              await Promise.allSettled([
+              const result = await Promise.allSettled([
                 github.rest.issues.createComment({
                   issue_number: context.issue.number,
                   owner: context.repo.owner,
@@ -65,5 +65,7 @@ jobs:
                   labels: ['needs reproduction'],
                 })
               ]);
+
+              console.log(result[0]);
             }
 
