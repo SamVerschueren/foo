@@ -40,7 +40,7 @@ jobs:
             function parseProjectInfo(comment) {
               const reproRegex = /https:\/\/(?:stackblitz\.com\/edit|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
 
-              const { slug } = comment.match(regexp)?.groups || {};
+              const { slug } = comment.match(reproRegex)?.groups || {};
 
               if (!slug) {
                 return null;
