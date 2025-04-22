@@ -24,7 +24,7 @@ jobs:
 
             if (!projectInfo) {
               // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
-              await comment('We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
+              await comment(issue.data, 'We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
 
               return;
             }
@@ -33,7 +33,7 @@ jobs:
 
             if (!projectExists) {
               // if the response is not ok, we can assume that the project is not public
-              await comment('We noticed that the project you shared is not public. Please change the visibility of the project to either secret or public.');
+              await comment(issue.data, 'We noticed that the project you shared is not public. Please change the visibility of the project to either secret or public.');
 
               return;
             }
@@ -52,7 +52,7 @@ jobs:
 
               // if the slug is `github`, we test if a GitHub link is provided
               if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
-                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[\w-_]+)\/(?<repo>[\w-_]+)/i;
+                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[\w\-_]+)\/(?<repo>[\w\-_]+)/i;
 
                 const { owner, repo } = comment.match(githubRegex)?.groups || {};
 
@@ -93,7 +93,12 @@ jobs:
               return false;
             }
 
-            async function comment(body) {
+            async function comment(issue, body) {
+              if (issue.labels.some((label) => label.name === 'needs reproduction')) {
+                // do not comment or add the label again if we already have the label
+                return;
+              }
+
               await Promise.allSettled([
                 github.rest.issues.createComment({
                   issue_number: context.issue.number,
