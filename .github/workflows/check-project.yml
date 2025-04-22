@@ -16,7 +16,9 @@ jobs:
               repo: context.repo.repo,
             });
 
-            const projectInfo = parseProjectInfo(issue.data.body);
+            console.log(issue.data);
+
+            const projectInfo = parseProjectInfo(issue.data.body ?? '');
 
             if (!projectInfo) {
               // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
