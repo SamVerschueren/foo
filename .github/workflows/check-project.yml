@@ -18,6 +18,8 @@ jobs:
 
             const projectInfo = parseProjectInfo(issue.data.body);
 
+            console.log(projectInfo);
+
             if (!projectInfo) {
               // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
               await comment('We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
