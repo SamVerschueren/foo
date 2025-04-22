@@ -42,7 +42,7 @@ jobs:
             await removeLabel();
 
             function parseProjectInfo(comment) {
-              const reproRegex = /https:\/\/(?:stackblitz\.com(?:\/edit)?|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
+              const reproRegex = /https:\/\/(?:stackblitz\.com|bolt\.new)\/(?:(?:~|c)\/)?(?:edit\/)?(?<slug>[a-zA-Z0-9-]+)/i;
 
               const { slug } = comment.match(reproRegex)?.groups || {};
 
