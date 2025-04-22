@@ -3,6 +3,7 @@ on:
     types: [opened, edited]
 jobs:
   checkProject:
+    if: "${{ github.event.issue.body?.includes('Link to the blitz that caused the error') }}"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/github-script@v7
