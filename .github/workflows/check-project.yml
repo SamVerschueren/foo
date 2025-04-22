@@ -16,37 +16,78 @@ jobs:
               repo: context.repo.repo,
             });
 
-            const regexp = /https:\/\/(stackblitz\.com\/edit|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
+            const projectInfo = parseProjectInfo(issue.data.body);
 
-            const match = issue.data.body.match(regexp);
-
-            const slug = match?.groups?.slug;
-
-            if (!slug) {
-              // if no slug is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
+            if (!projectInfo) {
+              // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
               await comment('We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a StackBlitz or Bolt reproduction link.');
 
               return;
             }
 
-            const response = await fetch(`https://stackblitz.com/api/projects/${slug}`, {
-              method: 'HEAD',
-            });
+            const projectExists = await checkProject(projectInfo); 
 
-            if (!response.ok) {
+            if (!projectExists) {
               // if the response is not ok, we can assume that the project is not public
               await comment('We noticed that the project you shared is not public. Please change the visibility of the project to either secret or public.');
 
               return;
             }
 
-            // if the response is ok, we can assume that the project is public and we can remove the label in case it was added before
-            await github.rest.issues.removeLabel({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: 'needs reproduction',
-            });
+            // we can remove the label in case it was added before
+            await removeLabel();
+
+            function parseProjectInfo(comment) {
+              const reproRegex = /https:\/\/(?:stackblitz\.com\/edit|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
+
+              const { slug } = comment.match(regexp)?.groups || {};
+
+              if (!slug) {
+                return null;
+              }
+
+              // if the slug is `github`, we test if a GitHub link is provided
+              if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
+                const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[^/]+)\/(?<repo>[^/?#]+)/i;
+
+                const { owner, repo } = comment.match(githubRegex)?.groups || {};
+
+                if (!owner || !repo) {
+                  return null;
+                }
+
+                return { type: 'github', owner, repo };
+              }
+
+              return { type: 'stackblitz', slug };
+            }
+
+            async function checkProject(projectInfo) {
+              if (projectInfo.type === 'github') {
+                const { owner, repo } = projectInfo;
+
+                const response = await github.rest.repos.get({
+                  owner,
+                  repo,
+                });
+
+                console.log(response);
+
+                return response.ok;
+              }
+
+              if (projectInfo.type === 'stackblitz') {
+                const { slug } = projectInfo;
+
+                const response = await fetch(`https://stackblitz.com/api/projects/${slug}`, {
+                  method: 'HEAD',
+                });
+
+                return response.ok;
+              }
+
+              return false;
+            }
 
             async function comment(body) {
               await Promise.allSettled([
@@ -65,3 +106,11 @@ jobs:
               ]);
             }
 
+            async function removeLabel() {
+              await github.rest.issues.removeLabel({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'needs reproduction',
+              });
+            }
