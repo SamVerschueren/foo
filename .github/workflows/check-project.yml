@@ -64,12 +64,16 @@ jobs:
               if (projectInfo.type === 'github') {
                 const { owner, repo } = projectInfo;
 
-                const response = await github.rest.repos.get({
-                  owner,
-                  repo,
-                });
+                try {
+                  const response = await github.rest.repos.get({
+                    owner,
+                    repo,
+                  });
 
-                return response.status === 200;
+                  return response.status === 200;
+                } catch {
+                  return false;
+                }
               }
 
               if (projectInfo.type === 'stackblitz') {
