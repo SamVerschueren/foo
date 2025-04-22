@@ -42,7 +42,7 @@ jobs:
             await removeLabel();
 
             function parseProjectInfo(comment) {
-              const reproRegex = /https:\/\/(?:stackblitz\.com\/edit|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
+              const reproRegex = /https:\/\/(?:stackblitz\.com(?:\/edit)?|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
 
               const { slug } = comment.match(reproRegex)?.groups || {};
 
@@ -53,6 +53,8 @@ jobs:
               // if the slug is `github`, we test if a GitHub link is provided
               if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
                 const githubRegex = /https:\/\/stackblitz\.com\/~\/github\.com\/(?<owner>[\w\-_]+)\/(?<repo>[\w\-_]+)/i;
+
+                console.log(comment);
 
                 const { owner, repo } = comment.match(githubRegex)?.groups || {};
 
