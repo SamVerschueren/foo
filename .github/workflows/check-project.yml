@@ -10,15 +10,17 @@ jobs:
         id: linear-check
         with:
           script: |
-            const { body: issueBody } = await github.rest.issues.get({
+            const issue = await github.rest.issues.get({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.repo
+              repo: context.repo.repo,
             });
+
+            console.log(issue);
 
             const regexp = /https:\/\/(stackblitz\.com|bolt\.new)\/(?:(?:~|c)\/)?(?<slug>[a-zA-Z0-9-]+)/i;
 
-            const match = issueBody.match(regexp);
+            const match = issue.data.body.match(regexp);
 
             const slug = match?.groups?.slug;
 
