@@ -49,16 +49,14 @@ jobs:
               }
 
               // if the slug is `github`, we test if a GitHub link is provided
-              if (slug === 'github' && comment.includes('https://stackblitz.com/~/github.com/')) {
+              if (slug === 'github') {
                 const githubRegex = /https:\/\/stackblitz\.com\/(?:~\/(?:github\.com|github_project)|github)\/(?<owner>[\w\-_]+)\/(?<repo>[\w\-_]+)/i;
 
                 const { owner, repo } = comment.match(githubRegex)?.groups || {};
 
-                if (!owner || !repo) {
-                  return null;
+                if (owner && repo) {
+                  return { type: 'github', owner, repo };
                 }
-
-                return { type: 'github', owner, repo };
               }
 
               return { type: 'stackblitz', slug };
