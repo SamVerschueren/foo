@@ -112,6 +112,8 @@ jobs:
             }
 
             async function removeLabel() {
+              console.log('remove label');
+
               await github.rest.issues.removeLabel({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
