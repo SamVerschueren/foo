@@ -18,8 +18,6 @@ jobs:
 
             const projectInfo = parseProjectInfo(issue.data.body ?? '');
 
-            console.log(projectInfo);
-
             if (!projectInfo) {
               // if no project info is found, we can assume that the user did not provide a StackBlitz or Bolt reproduction link
               await comment(issue.data, 'We noticed that you did not provide a StackBlitz or Bolt reproduction link. Please update the issue and add a link to a public project.');
@@ -71,9 +69,7 @@ jobs:
                   repo,
                 });
 
-                console.log(response);
-
-                return response.ok;
+                return response.status === 200;
               }
 
               if (projectInfo.type === 'stackblitz') {
@@ -112,8 +108,6 @@ jobs:
             }
 
             async function removeLabel() {
-              console.log('remove label');
-
               await github.rest.issues.removeLabel({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
